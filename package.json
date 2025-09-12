@@ -1,6 +1,6 @@
 {
   "name": "favicon-extractor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A lightweight Node.js utility to fetch and extract favicons from any website URL. Perfect for developers who need quick access to site icons for apps, extensions, or APIs.",
   "keywords": [
     "favicon",
@@ -9,13 +9,13 @@
     "website",
     "logo"
   ],
-  "homepage": "https://github.com/NitishKumar078/fetch-favicon#readme",
+  "homepage": "https://github.com/NitishKumar078/favicon-extractor#readme",
   "bugs": {
-    "url": "https://github.com/NitishKumar078/fetch-favicon/issues"
+    "url": "https://github.com/NitishKumar078/favicon-extractor/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NitishKumar078/fetch-favicon.git"
+    "url": "git+https://github.com/NitishKumar078/favicon-extractor.git"
   },
   "license": "MIT",
   "author": "Nitish kumar M",
