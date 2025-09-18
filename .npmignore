@@ -22,5 +22,12 @@ build/Release
 node_modules/
 
 
+# ignore the Demo prject 
+Demo/
+
+# ignore the test files
+test/
+
+
 # TypeScript cache
 *.tsbuildinfo
