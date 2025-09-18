@@ -34,7 +34,7 @@ yarn add favicon-extractor
 **Note: This package is designed for backend/server-side use only and requires a Node.js environment.**
 
 ```javascript
-import getFavicons, { getFavicon } from "favicon-extractor";
+import getFavicons, { getFavicon, type BatchResult } from "favicon-extractor";
 
 // Fetch favicons from multiple URLs
 const Favicons = await getFavicons([
@@ -46,12 +46,15 @@ console.log(Favicons);
 // Fetch favicon from a single URL
 const Favicon = await getFavicon("https://www.google.com");
 console.log(Favicon);
+
+// TypeScript usage with interface
+const favicon: BatchResult = await getFavicon("https://www.example.com");
 ```
 
 ### CommonJS Usage
 
 ```javascript
-const { getFavicons, getFavicon } = require("favicon-extractor");
+const { getFavicons, getFavicon, BatchResult } = require("favicon-extractor");
 
 // Usage remains the same
 const favicon = await getFavicon("https://www.example.com");
@@ -59,7 +62,21 @@ const favicon = await getFavicon("https://www.example.com");
 
 ## 📚 API Documentation
 
-### `getFavicons(urls: string[]): Promise<Array<FaviconResult>>`
+### TypeScript Interface
+
+```typescript
+interface BatchResult {
+  url: string;
+  hostname: string | null;
+  favicon: string | null;
+  success: boolean;
+  error?: string;
+}
+```
+
+The package exports the `BatchResult` interface for TypeScript users to ensure type safety when working with the returned favicon data.
+
+### `getFavicons(urls: string[]): Promise<BatchResult[]>`
 
 Fetch favicons for multiple URLs.
 
@@ -67,7 +84,7 @@ Fetch favicons for multiple URLs.
 - `urls` (string[]): Array of website URLs to extract favicons from
 
 **Returns:**
-- `Promise<Array<FaviconResult>>`: An array of favicon result objects
+- `Promise<BatchResult[]>`: An array of `BatchResult` objects
 
 **Example:**
 ```javascript
@@ -77,7 +94,7 @@ const favicons = await getFavicons([
 ]);
 ```
 
-### `getFavicon(url: string): Promise<FaviconResult>`
+### `getFavicon(url: string): Promise<BatchResult>`
 
 Fetch favicon for a single URL.
 
@@ -85,7 +102,7 @@ Fetch favicon for a single URL.
 - `url` (string): Website URL to extract favicon from
 
 **Returns:**
-- `Promise<FaviconResult>`: Favicon result object with detailed information
+- `Promise<BatchResult>`: A `BatchResult` object with detailed information
 
 **Example:**
 ```javascript
@@ -128,7 +145,8 @@ const favicon = await getFavicon("https://www.google.com");
   "url": "https://invalid-site.com",
   "hostname": "invalid-site",
   "favicon": null,
-  "success": false
+  "success": false,
+  "error": "Request timeout"
 }
 ```
 
@@ -170,10 +188,11 @@ const favicons = await getFavicons(manyUrls, {
 
 The package gracefully handles various error scenarios:
 
-- Invalid URLs return `success: false` with `favicon: null`
-- Network timeouts return `success: false` with `favicon: null`
+- Invalid URLs return `success: false` with `favicon: null` and optional `error` message
+- Network timeouts return `success: false` with `favicon: null` and `error: "Request timeout"`
 - Websites without favicons return `success: false` with `favicon: null`
-- All responses include the original URL and extracted hostname
+- All responses include the original URL and extracted hostname (or `null` if extraction fails)
+- Optional `error` field provides additional context when failures occur
 - No exceptions are thrown - all errors are handled internally
 
 ## 🖥️ Backend Environment Requirements
