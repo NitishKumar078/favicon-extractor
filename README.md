@@ -4,16 +4,18 @@
 [![npm downloads](https://img.shields.io/npm/dm/favicon-extractor.svg)](https://www.npmjs.com/package/favicon-extractor)
 [![license](https://img.shields.io/npm/l/favicon-extractor.svg)](https://github.com/yourusername/favicon-extractor/blob/main/LICENSE)
 
-A lightweight Node.js utility to fetch and extract favicons from any website URL. Perfect for apps, extensions, or APIs that need quick access to site icons.
+A lightweight **Node.js backend utility** to fetch and extract favicons from any website URL. Designed specifically for server-side applications, APIs, and backend services that need quick access to site icons.
 
 ## ✨ Features
 
+- **Backend-focused**: Built exclusively for Node.js server environments
 - Fetch favicons from a single URL or multiple URLs
-- Returns the best-matched favicon URL (or list)
+- Returns detailed favicon information with success status
 - Simple, promise-based API
-- Works with Node.js and modern JavaScript runtimes
+- Works with Node.js and server-side JavaScript runtimes
 - Lightweight with minimal dependencies
 - Handles common favicon formats and locations
+- Perfect for APIs, web scrapers, and backend services
 
 ## 📦 Installation
 
@@ -28,6 +30,8 @@ yarn add favicon-extractor
 ```
 
 ## 🚀 Usage
+
+**Note: This package is designed for backend/server-side use only and requires a Node.js environment.**
 
 ```javascript
 import getFavicons, { getFavicon } from "favicon-extractor";
@@ -55,7 +59,7 @@ const favicon = await getFavicon("https://www.example.com");
 
 ## 📚 API Documentation
 
-### `getFavicons(urls: string[]): Promise<Record<string, string | null>>`
+### `getFavicons(urls: string[]): Promise<Array<FaviconResult>>`
 
 Fetch favicons for multiple URLs.
 
@@ -63,7 +67,7 @@ Fetch favicons for multiple URLs.
 - `urls` (string[]): Array of website URLs to extract favicons from
 
 **Returns:**
-- `Promise<Record<string, string | null>>`: An object mapping each URL to its favicon URL (or `null` if not found)
+- `Promise<Array<FaviconResult>>`: An array of favicon result objects
 
 **Example:**
 ```javascript
@@ -73,7 +77,7 @@ const favicons = await getFavicons([
 ]);
 ```
 
-### `getFavicon(url: string): Promise<string | null>`
+### `getFavicon(url: string): Promise<FaviconResult>`
 
 Fetch favicon for a single URL.
 
@@ -81,7 +85,7 @@ Fetch favicon for a single URL.
 - `url` (string): Website URL to extract favicon from
 
 **Returns:**
-- `Promise<string | null>`: Favicon URL (or `null` if not found)
+- `Promise<FaviconResult>`: Favicon result object with detailed information
 
 **Example:**
 ```javascript
@@ -92,20 +96,40 @@ const favicon = await getFavicon("https://www.google.com");
 
 ### Multiple URLs
 ```json
-{
-  "https://www.google.com": "https://www.google.com/favicon.ico",
-  "https://www.github.com": "https://github.githubassets.com/favicons/favicon.png"
-}
+[
+  {
+    "url": "https://www.google.com",
+    "hostname": "google",
+    "favicon": "https://www.google.com/s2/favicons?domain=google.com&sz=64",
+    "success": true
+  },
+  {
+    "url": "https://www.github.com",
+    "hostname": "github",
+    "favicon": "https://www.google.com/s2/favicons?domain=github.com&sz=64",
+    "success": true
+  }
+]
 ```
 
 ### Single URL
 ```json
-"https://www.google.com/favicon.ico"
+{
+  "url": "https://brew.beer",
+  "hostname": "brew",
+  "favicon": "https://www.google.com/s2/favicons?domain=brew.beer&sz=64",
+  "success": true
+}
 ```
 
-### When favicon is not found
+### When favicon extraction fails
 ```json
-null
+{
+  "url": "https://invalid-site.com",
+  "hostname": "invalid-site",
+  "favicon": null,
+  "success": false
+}
 ```
 
 ## 🔧 Configuration Options
@@ -146,10 +170,24 @@ const favicons = await getFavicons(manyUrls, {
 
 The package gracefully handles various error scenarios:
 
-- Invalid URLs return `null`
-- Network timeouts return `null`
-- Websites without favicons return `null`
+- Invalid URLs return `success: false` with `favicon: null`
+- Network timeouts return `success: false` with `favicon: null`
+- Websites without favicons return `success: false` with `favicon: null`
+- All responses include the original URL and extracted hostname
 - No exceptions are thrown - all errors are handled internally
+
+## 🖥️ Backend Environment Requirements
+
+This package is specifically designed for **backend environments** and requires:
+
+- Node.js (version 14 or higher recommended)
+- Server-side JavaScript runtime
+- Network access for HTTP/HTTPS requests
+
+**Not suitable for:**
+- Browser/frontend applications
+- Client-side JavaScript
+- Edge functions with limited Node.js APIs
 
 ## 🤝 Contributing
 
@@ -161,4 +199,4 @@ MIT © Nitish Kumar M
 
 ---
 
-**Keywords:** favicon, icon, website, scraper, extractor, url, node.js, javascript, utility
+**Keywords:** favicon, icon, website, scraper, extractor, url, node.js, javascript, utility, backend, server-side
