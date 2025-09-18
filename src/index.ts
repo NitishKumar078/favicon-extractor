@@ -1,11 +1,28 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { URL } from "url";
 
 // Type definitions
-interface FaviconOptions {
+export interface FaviconOptions {
   timeout?: number;
   userAgent?: string;
+}
+
+/**
+ * Batch favicon extraction for multiple URLs
+ * @param urls - Array of URLs to process
+ * @param options - Configuration options
+ * @returns Promise resolving to array of results with URL and favicon info
+ */
+export interface BatchResult {
+  url: string;
+  hostname: string | null;
+  favicon: string | null;
+  success: boolean;
+  error?: string;
+}
+
+interface BatchOptions extends FaviconOptions {
+  concurrency?: number;
 }
 
 /**
@@ -104,7 +121,8 @@ export async function getFavicon(
     return googleFavicon;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`Error fetching favicon for ${url}:`, errorMessage);
+    // console.error(`Error fetching favicon for ${url}:`, errorMessage);
+    // return
 
     if (
       axios.isAxiosError(error) &&
@@ -160,25 +178,18 @@ export async function getFavicon(
       }
     }
 
-    return null;
+    throw new Error(errorMessage);
   }
 }
 
-/**
- * Batch favicon extraction for multiple URLs
- * @param urls - Array of URLs to process
- * @param options - Configuration options
- * @returns Promise resolving to array of results with URL and favicon info
- */
-interface BatchResult {
-  url: string;
-  favicon: string | null;
-  success: boolean;
-  error?: string;
-}
-
-interface BatchOptions extends FaviconOptions {
-  concurrency?: number;
+async function extractHostnameKeyword(url: string) {
+  try {
+    const hostname = new URL(url).hostname; // e.g., www.linkedin.com
+    const parts = hostname.replace(/^www\./, "").split(".");
+    return parts[0] || null; // returns 'linkedin' from 'www.linkedin.com'
+  } catch (e) {
+    return null; // invalid URL
+  }
 }
 
 export default async function getFavicons(
@@ -193,10 +204,12 @@ export default async function getFavicons(
     const batchPromises = batch.map(async (url): Promise<BatchResult> => {
       try {
         const favicon = await getFavicon(url, faviconOptions);
-        return { url, favicon, success: favicon !== null };
+        const hostname = await extractHostnameKeyword(url);
+        return { url, hostname, favicon, success: favicon !== null };
       } catch (error: unknown) {
         return {
           url,
+          hostname: null,
           favicon: null,
           success: false,
           error: error instanceof Error ? error.message : String(error),
@@ -210,6 +223,7 @@ export default async function getFavicons(
           ? result.value
           : {
               url: "unknown",
+              hostname: "unknown",
               favicon: null,
               success: false,
               error: String(result.reason),
