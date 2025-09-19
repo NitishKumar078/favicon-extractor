@@ -1,6 +1,6 @@
 {
   "name": "favicon-extractor",
-  "version": "1.1.2",
+  "version": "1.1.4",
   "description": "A lightweight Node.js utility to fetch and extract favicons from any website URL. Perfect for developers who need quick access to site icons for apps, extensions, or APIs.",
   "keywords": [
     "favicon",
