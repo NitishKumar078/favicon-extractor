@@ -100,29 +100,17 @@ export async function getFavicon(
       }
     }
 
-    // Method 2: Try standard favicon.ico location
-    const standardFavicon: string = new URL("/favicon.ico", baseUrl).href;
-
-    try {
-      const headResponse = await axios.head(standardFavicon, {
-        timeout,
-        headers: { "User-Agent": userAgent },
-      });
-
-      if (headResponse.status === 200) {
-        return standardFavicon;
-      }
-    } catch (error) {
-      // Standard favicon not found, continue to next method
-    }
-
     // Method 3: Try Google's favicon service as fallback
     const googleFavicon = `https://www.google.com/s2/favicons?domain=${parsedUrl.host}&sz=64`;
     return googleFavicon;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    // console.error(`Error fetching favicon for ${url}:`, errorMessage);
-    // return
+    const parsedUrlCatch = new URL(
+      url.startsWith("http://") || url.startsWith("https://")
+        ? url
+        : `https://${url}`
+    );
+    const baseUrlCatch = `${parsedUrlCatch.protocol}//${parsedUrlCatch.host}`;
 
     if (
       axios.isAxiosError(error) &&
@@ -130,12 +118,7 @@ export async function getFavicon(
       typeof error.response.data === "string"
     ) {
       const $ = cheerio.load(error.response.data);
-      const parsedUrlCatch = new URL(
-        url.startsWith("http://") || url.startsWith("https://")
-          ? url
-          : `https://${url}`
-      );
-      const baseUrlCatch = `${parsedUrlCatch.protocol}//${parsedUrlCatch.host}`;
+
       // Look for various favicon link tags
       const faviconSelectors = [
         'link[rel="icon"]',
@@ -175,6 +158,23 @@ export async function getFavicon(
             continue;
           }
         }
+      } // Method 2: Try standard favicon.ico location
+      const standardFavicon: string = new URL("/favicon.ico", baseUrlCatch)
+        .href;
+
+      try {
+        const headResponse = await axios.head(standardFavicon, {
+          timeout,
+          headers: { "User-Agent": userAgent },
+        });
+
+        if (headResponse.status === 200) {
+          return standardFavicon;
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        throw new Error(errorMessage);
       }
     }
 
