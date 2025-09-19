@@ -49,23 +49,7 @@ export async function getFavicon(
     const parsedUrl = new URL(url);
     const baseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
 
-    // Method 1: Try standard favicon.ico location
-    const standardFavicon: string = new URL("/favicon.ico", baseUrl).href;
-
-    try {
-      const headResponse = await axios.head(standardFavicon, {
-        timeout,
-        headers: { "User-Agent": userAgent },
-      });
-
-      if (headResponse.status === 200) {
-        return standardFavicon;
-      }
-    } catch (error) {
-      // Standard favicon not found, continue to next method
-    }
-
-    // Method 2: Parse HTML for favicon links
+    // Method 1: Parse HTML for favicon links
     const response = await axios.get(url, {
       timeout,
       headers: { "User-Agent": userAgent },
@@ -114,6 +98,22 @@ export async function getFavicon(
           }
         }
       }
+    }
+
+    // Method 2: Try standard favicon.ico location
+    const standardFavicon: string = new URL("/favicon.ico", baseUrl).href;
+
+    try {
+      const headResponse = await axios.head(standardFavicon, {
+        timeout,
+        headers: { "User-Agent": userAgent },
+      });
+
+      if (headResponse.status === 200) {
+        return standardFavicon;
+      }
+    } catch (error) {
+      // Standard favicon not found, continue to next method
     }
 
     // Method 3: Try Google's favicon service as fallback
