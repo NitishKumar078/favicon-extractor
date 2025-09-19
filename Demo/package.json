@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "favicon-extractor": "^1.0.2",
+    "favicon-extractor": "^1.1.5",
     "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0"
